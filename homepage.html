@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+
+<head>
+    <link href="login.css" rel="stylesheet">
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.linkify.js"></script>
+
+    <script>
+
+        function getRecords(userid) {
+            //console.log("userid:"+userid);
+            $("ol").html('');
+            if (1) {
+                let url = "http://localhost/todoapi/feed";
+                let data = {
+
+                    "user_id": userid
+
+                };
+
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: JSON.stringify(data),
+                    dataType: "json",
+                    contentType: 'text/hmtl',
+                    cache: false,
+                    success: function (res) {
+                        if (res) {
+                            for (i = 0; i < res.feedData.length; i++) {
+                                //console.log(res.feedData[i]);
+                                $("ol").append("<li id='record" + res.feedData[i].todolist_id + "'>" + res.feedData[i].todolist + "<button id='todo" + res.feedData[i].todolist_id + "' class='newdel'>delete</button><button class='com'>Comment</button><br><br><input type='text'></input></li>");
+                                //$("button").addClass("del");
+                            }
+
+                            $("ol").linkify({
+                                target: "_blank"
+                            });
+                            // console.log(res.feedData[0]);
+                            //$("#show_list").text(show_list);
+                        }
+                    }
+                });
+            }
+            else {
+                alert("Please provide valid data");
+            }
+        }
+        function checklocaldata() {
+            if (localStorage.getItem("userid") == null) {
+                //console.log("check local data");
+                window.location.replace("/todolistproject/login.html");
+            }
+
+        }
+        function logoff() {
+            localStorage.clear();
+            window.location.replace("/todolistproject/login.html");
+        }
+        $(document).ready(function () {
+
+            let userid, name;
+            userid = localStorage.getItem("userid");
+            name = localStorage.getItem("name");
+            //console.log(name);
+            $("#wel").text("Welcome" + ' ' + name);
+            checklocaldata();
+            getRecords(userid);
+            let listid;
+            $("#logoff").click(function () {
+                logoff();
+            });
+            $("#btn").click(function () {
+                let list = $("#todolist").val().trim();
+                if (list) {
+                    let url = "http://localhost/todoapi/feedUpdate";
+                    let data = {
+
+                        "user_id": userid,
+                        "feed": list
+                    };
+
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: "json",
+                        contentType: 'text/hmtl',
+                        cache: false,
+                        success: function (res) {
+                            if (res.todoListData.todolist);
+                            {
+                                $("#list_data").text(res.todoListData.todolist);
+                                listid = res.todoListData.todolist_id;
+                                //listid);
+                                $("ol").prepend("<li >" + res.todoListData.todolist + "<button id='todo" + res.todoListData.todolist_id + "' class='newdel'>delete</button><button class='com'>Comment</button><br><br><input type='text'></input></li>");
+                                $("#todolist").val('').focus();
+                            }
+
+                            $("ol").linkify({
+                                target: "_blank"
+                            });
+                        }
+                    });
+                }
+                else {
+                    alert("Please provide valid data");
+                }
+
+            });
+
+            $('body').on('click', '.com', function () {
+                console.log("Insde comment");
+                $("#comm").text("HI");
+            });
+
+
+
+            $('body').on('click', '.newdel', function () {
+                let todo_id = $(this).attr('id');
+                let result = todo_id.split("todo");
+
+                console.log(todo_id);
+                if (todo_id) {
+                    let url = "http://localhost/todoapi/feedDelete";
+                    let data = {
+
+                        "user_id": userid,
+                        "todolist_id": result[1]
+                    };
+
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: "json",
+                        contentType: 'text/hmtl',
+                        cache: false,
+                        success: function (res) {
+                            if (res.success) {
+                                //$("#list_data").text("");
+                                //alert("success");
+                                $("#record" + result[1]).fadeOut( "slow" );
+
+                            }
+                        }
+                    });
+                }
+                else {
+                    alert("Please provide valid data");
+                }
+            });
+        });
+    </script>
+</head>
+
+<body>
+    <div>
+        <p id="wel"></p>
+    </div>
+    <div>
+        <label for="todolist">Enter your list data</label><br>
+        <input type="text" id="todolist" class="typ" name="todolist" placeholder="Enter list" ><br>
+        <input type="submit" id="btn" class="wallButton" value="Enter List">
+    </div>
+    <div>
+
+
+        <ol>
+            <p id="comm"></p>>
+        </ol>
+    </div>
+
+    <div>
+        <input type="submit" class="wallButton" id="logoff" value="LogOut"></input>
+    </div>
+
+
+</body>
+
+</html>

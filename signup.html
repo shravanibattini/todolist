@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+
+<head>
+    <link href="login.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        
+        function checklocaldata(){
+            if(localStorage.getItem("userid")!=null)
+            {
+                console.log("check local data");
+                window.location.replace("/todolistproject/homepage.html");
+            }
+
+        }
+        $(document).ready(function () {
+            /* Signup action */
+            $(".wallButton").click(function () {
+                let name = $("#name").val().trim();
+                let username = $("#uname").val().trim();
+                let password = $("#pwd").val().trim();
+
+                if (username.length > 3 && name && password.length > 6) {
+
+
+                    let url = "http://localhost/todoapi/signup";
+                    let data = {
+                        "name": name,
+                        "username": username,
+                        "password": password
+                    };
+
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: "json",
+                        contentType: 'text/hmtl',
+                        cache: false,
+                        success: function (res) {
+                            if(res.status){
+                                //console.log(res);
+                                window.location.replace("/todolistproject/login.html");
+                            }
+                            else{
+                                $("#err").text("Please provide valid data");
+                            }
+                            
+
+                        }
+                    });
+
+                } else {
+                    $("#err").text("Please provide valid data");
+                }
+
+            });
+
+
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <div style="border: lightseagreen 3px;">
+        <h1>REGISTRATION</h1>
+
+        <label for="name">Name</label><br>
+        <input type="text" id="name" class="typ" name="name" placeholder="Full Name"><br>
+        <label for="username">Username</label><br>
+        <input type="text" id="uname" class="typ" name="username" placeholder="Enter Username"><br>
+        <label for="password">Password</label><br>
+        <input type="password" id="pwd" class="typ" name="password" placeholder="Enter password"><br>
+        <input type="submit" id="btn" class="wallButton" value="Sign Up"><br>
+
+        <label for="login">Already a member,please <a href="login.html">login</a> here</label><br>
+
+    </div>
+    <div>
+        <p id="err"></p>
+    </div>
+</body>
+
+</html>

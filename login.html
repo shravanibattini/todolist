@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<head>
+    <link href="login.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function storeuserid(name,userid) {
+            if (typeof (Storage) !== "undefined") {
+                // Store
+                localStorage.setItem("name", name);
+                localStorage.setItem("userid", userid);
+            }
+        }
+        function checklocaldata(){
+            if(localStorage.getItem("userid")!=null)
+            {
+                //console.log("check local data");
+                window.location.replace("/todolistproject/homepage.html");
+            }
+
+        }
+        $(document).ready(function () {
+            checklocaldata();
+            $("#btn").click(function () {
+                let username = $("#uname").val().trim();
+                let pwd = $("#pwd").val().trim();
+                if (username && pwd) {
+                    let url = "http://localhost/todoapi/login";
+                    let data = {
+
+                        "username": username,
+                        "password": pwd
+                    };
+                    $.ajax({
+                        url: url,
+                        type: "POST",
+                        data: JSON.stringify(data),
+                        dataType: "json",
+                        contentType: 'text/hmtl',
+                        cache: false,
+                        success: function (res) {
+                            if (res.userData) {
+                                
+                                //console.log(res.userData.name);
+                                storeuserid(res.userData.name,res.userData.user_id);
+                                window.location.replace("/todolistproject/homepage.html");
+                            }
+                            else {
+                                $("#err").text("Please provide valid data");
+                            }
+
+                        }
+                    });
+
+                } else {
+                    $("#err").text("Please provide valid data");
+                }
+
+
+            });
+
+        });
+    </script>
+</head>
+
+<body>
+
+    <div>
+        <h3>WELCOME</h3>
+    </div>
+    <div>
+        <label for="username">Username</label><br>
+        <input type="text" id="uname" class="typ" name="username" placeholder="Enter Username" autocomplete="on"><br>
+        <label for="password">Password</label><br>
+        <input type="password" id="pwd" class="typ" name="password" placeholder="Enter password" autocomplete="off"><br>
+        <input type="submit" id="btn" class="wallButton" value="LOGIN"><br>
+    </div>
+    <div>
+        <p id="err"></p>
+    </div>
+
+    <label for="sign in">Not a member,please <a href="signup.html">sign up </a> here</label><br>
+</body>
+
+</html>
